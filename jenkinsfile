@@ -2,38 +2,30 @@ pipeline {
     agent any
 
     stages {
-        stage('git') {
+        stage('Git Checkout') {
             steps {
-               git branch: 'war', url: 'https://github.com/Seshadriraghav22/M12.git'
+                git branch: 'war', url: 'https://github.com/Seshadriraghav22/M12.git'
             }
         }
-        stage('build') {
+        stage('Build') {
             steps {
-				sh 'mvn clean'
-				sh 'mvn install'
-
+                sh 'mvn clean'
+                sh 'mvn install'
             }
         }
         stage('Docker Image') {
             steps {
-				script{
-					 sh ' docker build -t app . '
-					}
-				}
-
+                script {
+                    sh 'docker build -t app:latest .'
+                }
             }
         }
-      
-									}
-        stage('Deploy to server') {
+        stage('Deploy to Server') {
             steps {
-				
-			script{										
-			         sh ' docker run -d -p 8080:8080 app'
-                               }
-                  }
-      }
-									
+                script {
+                    sh 'docker run -d -p 8080:8080 app:latest'
+                }
+            }
+        }
     }
 }
-
