@@ -23,7 +23,7 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 script {
-                    sh 'docker run -d -p 8080:8080 app:latest'
+                    sh 'docker run -d -p 8082:8080 app:latest'
                 }
             }
         }
