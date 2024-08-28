@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('git') {
             steps {
-               git branch: 'war', url: 'https://github.com//M12.git'
+               git branch: 'war', url: 'https://github.com/Seshadriraghav22/M12.git'
             }
         }
         stage('build') {
