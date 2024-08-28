@@ -2,30 +2,58 @@ pipeline {
     agent any
 
     stages {
-        stage('Git Checkout') {
+        stage('git') {
             steps {
-                git branch: 'war', url: 'https://github.com/Seshadriraghav22/M12.git'
+               git branch: 'war', url: 'https://github.com//M12.git'
             }
         }
-        stage('Build') {
+        stage('build') {
             steps {
-                sh 'mvn clean'
-                sh 'mvn install'
+				sh 'mvn clean'
+				sh 'mvn install'
+
             }
         }
         stage('Docker Image') {
             steps {
-                script {
-                    sh 'docker build -t app:latest .'
-                }
+				script{
+					app = docker.build("dockerpandian/may19")
+					app.inside{
+					  sh 'echo $(curl localhost:8080)'
+					}
+				}
+
             }
         }
-        stage('Deploy to Server') {
+        stage('Push Docker Image') {
             steps {
-                script {
-                    sh 'docker run -d -p 8082:8080 app:latest'
-                }
-            }
-        }
+				script{		
+					docker.withRegistry('https://registry.hub.docker.com', 'dochub') {
+					   app.push("${env.BUILD_NUMBER}")
+					   app.push("latest")
+					}
+				}
+			}
+									}
+        stage('Deploy to server') {
+            steps {
+				input 'Deploy to Production?'
+				milestone(1)
+				withCredentials([usernamePassword(credentialsId: 'prod', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+			script{										
+			  sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull dockerpandian/may19:${env.BUILD_NUMBER}\""
+			try{
+				sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker stop demo-deploy\""
+			    sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker rm  demo-deploy\""
+				 }  catch (err) {
+						echo: 'caught error: $err'
+				 }
+				 sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker run --restart always --name demo-deploy -p 8080:8080 -d dockerpandian/may19:${env.BUILD_NUMBER}\""
+				 }
+				}
+			}
+				}	
+				 
+									
     }
 }
