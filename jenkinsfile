@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        PATH = "${env.PATH}:/usr/bin"
+    }
+
     stages {
         stage('git') {
             steps {
