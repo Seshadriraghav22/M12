@@ -23,16 +23,6 @@ pipeline {
                 }
             }
         }
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'dochub') {
-                        app.push("${env.BUILD_NUMBER}")
-                        app.push("latest")
-                    }
-                }
-            }
-        }
         stage('Deploy to Server') {
             steps {
                 script {
