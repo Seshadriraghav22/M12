@@ -1,63 +1,44 @@
 pipeline {
     agent any
 
-    environment {
-        PATH = "${env.PATH}:/usr/bin"
-    }
-
     stages {
-        stage('git') {
+        stage('Clone Repository') {
             steps {
-               git branch: 'war', url: 'https://github.com/Seshadriraghav22/M12.git'
+                git branch: 'war', url: 'https://github.com/Seshadriraghav22/M12.git'
             }
         }
-        stage('build') {
+        stage('Build Project') {
             steps {
-				sh 'mvn clean'
-				sh 'mvn install'
-
+                sh 'mvn clean'
+                sh 'mvn install'
             }
         }
-        stage('Docker Image') {
+        stage('Build Docker Image') {
             steps {
-				script{
-					app = docker.build("seshadriraghav22/may19")
-					app.inside{
-					  sh 'echo $(curl localhost:8080)'
-					}
-				}
-
+                script {
+                    app = docker.build("seshadriraghav22/may19")
+                    app.inside {
+                        sh 'echo $(curl localhost:8080)'
+                    }
+                }
             }
         }
         stage('Push Docker Image') {
             steps {
-				script{		
-					docker.withRegistry('https://registry.hub.docker.com', 'dochub') {
-					   app.push("${env.BUILD_NUMBER}")
-					   app.push("latest")
-					}
-				}
-			}
-									}
-        stage('Deploy to server') {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dochub') {
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
+                    }
+                }
+            }
+        }
+        stage('Deploy to Server') {
             steps {
-				input 'Deploy to Production?'
-				milestone(1)
-				withCredentials([usernamePassword(credentialsId: 'prod', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
-			script{										
-			  sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull seshadriraghav22/may19:${env.BUILD_NUMBER}\""
-			try{
-				sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker stop demo-deploy\""
-			    sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker rm  demo-deploy\""
-				 }  catch (err) {
-						echo: 'caught error: $err'
-				 }
-				 sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker run --restart always --name demo-deploy -p 8080:8080 -d seshadriraghav22/may19:${env.BUILD_NUMBER}\""
-				 }
-				}
-			}
-				}	
-				 
-									
+                script {
+                    sh "docker run --restart always --name demo-deploy -p 8080:8080 -d seshadriraghav22/may19:${env.BUILD_NUMBER}"
+                }
+            }
+        }
     }
 }
