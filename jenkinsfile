@@ -16,9 +16,11 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Build the Docker image
                     app = docker.build("seshadriraghav22/may19")
+                    // Run a test command inside the Docker container
                     app.inside {
-                        sh 'echo $(curl localhost:8080)'
+                        sh 'curl -f http://localhost:8080 || echo "Service not available"'
                     }
                 }
             }
@@ -26,6 +28,14 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 script {
+                    // Ensure to stop and remove any existing container
+                    sh '''
+                    if [ "$(docker ps -q -f name=demo-deploy)" ]; then
+                        docker stop demo-deploy
+                        docker rm demo-deploy
+                    fi
+                    '''
+                    // Run the new container
                     sh "docker run --restart always --name demo-deploy -p 8080:8080 -d seshadriraghav22/may19"
                 }
             }
