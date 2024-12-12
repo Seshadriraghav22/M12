@@ -37,19 +37,24 @@ pipeline {
         }
         stage('Deploy to Server') {
             steps {
-                script {
-                    // Ensure to stop and remove any existing container
-                    sh '''
-                    if [ "$(docker ps -q -f name=demo-deploy)" ]; then
-                        docker stop demo-deploy
-                        docker rm demo-deploy
-                    fi
-                    '''
-                    // Run the new container
-                    sh "docker run --restart always --name demo-deploy -p 8082:8080 -d seshadriraghav22/may19"
+                input 'Deploy to Production?' // Prompt for user input
+                milestone(1) // Mark this stage as a milestone to prevent skipping it
+
+                withCredentials([usernamePassword(credentialsId: 'prod', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+                    script {
+                        try {
+                            // Pull the Docker image in the production server
+                            sh """
+                                sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \
+                                "docker pull dockerpandian/may19:${env.BUILD_NUMBER}"
+                            """
+                        } catch (Exception e) {
+                            echo "Deployment failed: ${e.getMessage()}"
+                            currentBuild.result = 'FAILURE' // Mark the build as failed if the deployment fails
+                        }
+                    }
                 }
             }
         }
     }
 }
-
