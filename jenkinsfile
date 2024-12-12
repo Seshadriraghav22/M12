@@ -45,7 +45,7 @@ pipeline {
                         try {
                             // Pull the Docker image in the production server
                             sh """
-                                sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@prod_ip \
+                                sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \
                                 "docker pull seshadriraghav22/may19:${env.BUILD_NUMBER}"
                             """
                         } catch (Exception e) {
