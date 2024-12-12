@@ -36,7 +36,7 @@ pipeline {
                     fi
                     '''
                     // Run the new container
-                    sh "docker run --restart always --name demo-deploy -p 8080:8080 -d seshadriraghav22/may19"
+                    sh "docker run --restart always --name demo-deploy -p 8082:8080 -d seshadriraghav22/may19"
                 }
             }
         }
