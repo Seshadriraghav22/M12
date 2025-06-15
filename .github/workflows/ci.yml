@@ -25,7 +25,6 @@ jobs:
      - name: Upload Artifact 
        uses: actions/upload-artifact@v3
        with:
-          name: petclinic-war
-          path: "/petclinic.war"
-
+          name: war-artifact
+          path: target/*.war
      
