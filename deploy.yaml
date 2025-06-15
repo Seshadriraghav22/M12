@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: product-catalog
-        image: your-dockerhub-username/docker-war-demo:latest  # <- this gets updated by GitHub Actions
+        image: seshadriraghav22/docker-war-demo:15663511424
         ports:
         - containerPort: 8080
         readinessProbe:
