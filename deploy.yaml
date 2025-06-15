@@ -44,5 +44,5 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8080
-  type: LoadBalancer  # or use "NodePort" if you're not on a cloud provider
+  type: NodePort  # or use "NodePort" if you're not on a cloud provider
 
