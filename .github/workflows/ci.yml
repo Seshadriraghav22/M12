@@ -1,1 +1,21 @@
 
+name: Animal Farm NodeJS CI
+on:
+  push:
+    branches:
+      - war
+  pull_request:
+    branches:
+      -  war
+
+jobs:
+  build:
+     runs-on: ubuntu-latest
+     steps:
+     - name: Checkout repo
+       uses: actions/checkout@v3
+     - name: java
+       uses: actions/java@v5
+
+
+     
