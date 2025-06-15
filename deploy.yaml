@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: product-catalog
-        image: seshadriraghav22/docker-war-demo:15664789395
+        image: seshadriraghav22/docker-war-demo:15664837696
         ports:
         - containerPort: 8080
        
