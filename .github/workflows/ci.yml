@@ -1,5 +1,5 @@
 
-name: Animal Farm NodeJS CI
+name: CI
 on:
   push:
     branches:
@@ -23,7 +23,7 @@ jobs:
        run: mvn clean package
 
      - name: Upload Artifact 
-       uses: actions/upload-artifact@v3
+       uses: actions/upload-artifact@v4
        with:
           name: war-artifact
           path: target/*.war
